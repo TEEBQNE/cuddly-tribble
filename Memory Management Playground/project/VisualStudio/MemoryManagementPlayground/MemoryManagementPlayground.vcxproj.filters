@@ -1,0 +1,62 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup>
+    <Filter Include="Source Files">
+      <UniqueIdentifier>{4FC737F1-C7A5-4376-A066-2A32D752A2FF}</UniqueIdentifier>
+      <Extensions>cpp;c;cc;cxx;def;odl;idl;hpj;bat;asm;asmx</Extensions>
+    </Filter>
+    <Filter Include="Header Files">
+      <UniqueIdentifier>{93995380-89BD-4b04-88EB-625FBE52EBFB}</UniqueIdentifier>
+      <Extensions>h;hh;hpp;hxx;hm;inl;inc;ipp;xsd</Extensions>
+    </Filter>
+    <Filter Include="Resource Files">
+      <UniqueIdentifier>{67DA6AB6-F800-4c08-8B7A-83BB121AAD01}</UniqueIdentifier>
+      <Extensions>rc;ico;cur;bmp;dlg;rc2;rct;bin;rgs;gif;jpg;jpeg;jpe;resx;tiff;tif;png;wav;mfcribbon-ms</Extensions>
+    </Filter>
+    <Filter Include="Header Files\mmp">
+      <UniqueIdentifier>{98406af2-fcb0-4ad5-acdd-48ec9bfc3b91}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\mmp">
+      <UniqueIdentifier>{75a8d69c-cc9a-4939-b262-a9fb6751077f}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Header Files\mmp\_inl">
+      <UniqueIdentifier>{c5a5d9a2-fda3-4f41-b727-8793d14707c4}</UniqueIdentifier>
+    </Filter>
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="..\..\..\include\mmp\mmp_file.h">
+      <Filter>Header Files\mmp</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\include\mmp\mmp_memory.h">
+      <Filter>Header Files\mmp</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\include\mmp\mmp_types.h">
+      <Filter>Header Files\mmp</Filter>
+    </ClInclude>
+    <ClInclude Include="cPointer.h">
+      <Filter>Header Files\mmp</Filter>
+    </ClInclude>
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="..\..\..\source\MemoryManagementPlayground\mmp\mmp_file.c">
+      <Filter>Source Files\mmp</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\source\MemoryManagementPlayground\mmp\mmp_memory.c">
+      <Filter>Source Files\mmp</Filter>
+    </ClCompile>
+    <ClCompile Include="cPointer.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="..\..\..\include\mmp\_inl\mmp_file.inl">
+      <Filter>Header Files\mmp\_inl</Filter>
+    </None>
+    <None Include="..\..\..\include\mmp\_inl\mmp_memory.inl">
+      <Filter>Header Files\mmp\_inl</Filter>
+    </None>
+    <None Include="cPointer.inl">
+      <Filter>Header Files\mmp\_inl</Filter>
+    </None>
+  </ItemGroup>
+</Project>
