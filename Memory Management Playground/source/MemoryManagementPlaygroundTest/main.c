@@ -6,9 +6,10 @@ Copyright 2019-2020
 //-----------------------------------------------------------------------------
 
 #include "mmp/mmp_memory.h"
+//#include <stdio.h>
+
 
 #pragma comment(lib, "MemoryManagementPlayground.lib")
-
 
 //-----------------------------------------------------------------------------
 
@@ -32,8 +33,10 @@ int testMalloc(decl_argc, decl_argv);
 
 int main(decl_argc, decl_argv)
 {
-	//return testMMP(argc, argv);
-	return testMalloc(argc, argv);
+
+
+	return testMMP(argc, argv);
+	//return testMalloc(argc, argv);
 }
 
 
@@ -51,7 +54,12 @@ int testMMP(decl_argc, decl_argv)
 	size count = sizeof(chunk);
 	ptr chunk_base = mmp_set_zero(chunk, count);
 
-	
+	// create a structure given the chunk starting position, defined malloc block size
+	// and size of entire pool itself
+
+	// as for now I have no reason to break up the chunk into multiple pools, just giving
+	// one pool all of the memory
+	addr malloc_Pool = mmp_pool_init(chunk_base, 4, count);
 
 	// done, stack-allocated data popped
 	return 0;
@@ -105,53 +113,46 @@ int testMalloc(decl_argc, decl_argv)
 	
 #pragma region MallocFun
 
-	// implement the data structure as if it was the real malloc
-	// in mmp_memory.c create your own data structrures the ones that are created here
-	// just use what is pertinent and use your own
-	// pointers are relevant as they will tell you which data structures malloc uses to allocate memory
-	// figure out what memory allocation malloc uses
-	typedef union malloctest_tag
-	{
-		i32 data[32];
 
-		ptr pdata[32];
-		struct 
-		{
-			i32 dummy;
-		};
-	}malloctest;
+#pragma region  mallocDebuggTesting
 
-	typedef union other_test
-	{
-		int test[5];
-	}otherTest;
+	//for (int x = 4; x < 65536; x += 4)
+	//{
+	//	malloctest* test1 = malloc(x);
+	//
+	//	size_t test = (size_t)test1;
+	//
+	//	free(test1);
+	//
+	//	malloctest* test2 = malloc(x);
+	//	size_t test0 = (size_t)test2;
+	//
+	//	if (test0 != test)
+	//	{
+	//		printf("This number does not have same address: %d", x); printf("\n");
+	//	}
+	//	//if
+	//	//	printf("This number does not have same address: %d", x);
+	//}
 
-	malloctest* test1024 = malloc(4);
-	malloctest* test2048 = malloc(4);
-	malloctest* test4096 = malloc(4);
-	malloctest* test8192 = malloc(4);
-	malloctest* test16 = malloc(4);
+	//malloctest* test1024 = malloc(32);
+	//free(test1024);
+	//
+	//malloctest* test1025 = malloc(32);
 
+	//free(test1025);
 
-	
-
-	int a[5] = { 1, 2, 3, 4, 5 };
-
-	int* p = a;
-
-	//testTest.test[0] = 5;
-
-
-	free(test1024);
-
-	test1024 = malloc(8192);
-
-
-
-	free(test4096);
-	free(test1024);
-	free(test2048);
-	free(test8192);
+	//void* test = malloc(1024);
+	//
+	//int* list[256];
+	//
+	//for (int i = 50; i < 306; i++)
+	//{
+	//	list[i] = (int*)(test)+i;
+	//}
+	//
+	//free(test);
+#pragma endregion
 #pragma endregion
 	// done
 	return 0;

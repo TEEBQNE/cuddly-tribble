@@ -8,11 +8,39 @@ Copyright 2019-2020
 #include "mmp/mmp_memory.h"
 
 #include "mmp/mmp_file.h"
+#include <stdio.h>
 
 
 //-----------------------------------------------------------------------------
 
+// structure for a linked list
+typedef struct linkedList_tag {
+	// pointing to the next block (null if it is pointing to no memory)
+	struct linkedList_tag* next;
 
+	// pointing to the previous block (null if it the first block)
+	struct linkedList_tag* previous;
+} linkedList;
+
+// structure to hold data similar to what malloc holds
+// user should be able to access address and size (Not prev/next)
+// structued similarly to how we were shown to create a container in class
+// i.e union (Important as unions store multiple data types in same memory location
+// all of mallocs data appears in the same location right before the allocated block
+typedef union malloctest_tag
+{
+	// actual pointer to start of block in memory
+	addr blockAddress;
+
+	// stored linkedList structure of next/previous block of memory
+	linkedList node;
+
+	// size of this current block
+	size_t sizeOfBlock;
+
+	// determines if this block is in use or not
+	__vcrt_bool isInuse;
+}malloctest;
 
 //-----------------------------------------------------------------------------
 // internal utilities
@@ -165,11 +193,34 @@ size mmp_compare(kaddr const block_0, kaddr const block_1, size const size_bytes
 //-----------------------------------------------------------------------------
 // pool utilities
 
+/// creates a list when given a new chunk to use as a pool
+void createList(linkedList *listHead)
+{
+	listHead->previous = NULL;
+	listHead->next = NULL;
+}
+
+void addToList(struct linkedList* listHead, struct linkedList* prev, struct linkedList* next)
+{
+
+}
+
 addr mmp_pool_init(addr const block_base, size const block_base_size, size const pool_size_bytes)
 {
 	if (block_base && block_base_size && pool_size_bytes)
 	{
-		// add memory to a structure to be managed
+		// create a linked list to point at the base of the block
+		// give it the total size of the given block (pool)
+		// then specify the min size (block_base_size)
+		malloctest *initPool = (void *)block_base;
+
+		// represent accurate memory in space by substracting all data the structure keeps up
+		initPool->sizeOfBlock = pool_size_bytes - sizeof(malloctest);
+		initPool->isInuse = 0;
+
+		createList(&initPool->node);
+
+		return initPool;
 	}
 	return 0;
 }
@@ -194,6 +245,39 @@ addr mmp_block_reserve(addr const pool, size const block_size_bytes)
 	{
 		// determine if what is being allocated is under the size of one block, if it is and there is memory
 		// that is free, allocate it, if not then tell the user
+
+		// cast to head of the block, iterator pointer and new allocation
+		malloctest* listHead, *temp, *newMalloc = NULL;
+		
+		listHead = temp = (malloctest*)pool;
+
+		ui32 actualSize = block_size_bytes + sizeof(malloctest);
+
+		// find next opening position in pool if there is one
+		// or until a position is found
+		do
+		{
+			if (!temp->isInuse && temp->sizeOfBlock >= actualSize)
+			{
+				if(temp->sizeOfBlock != actualSize)
+				{
+					// split up the block and create a new block
+				}
+				else
+				{
+					// is equal, take up the whole block
+				}
+			}
+			else
+			{
+				temp = (malloctest*)temp->node.next;
+			}
+		} while (newMalloc == NULL && temp != NULL);
+
+		if (newMalloc != NULL)
+			return newMalloc->blockAddress;
+		else
+			return 0;
 	}
 	return 0;
 }
