@@ -27,7 +27,7 @@ typedef struct linkedList_tag {
 // structued similarly to how we were shown to create a container in class
 // i.e union (Important as unions store multiple data types in same memory location
 // all of mallocs data appears in the same location right before the allocated block
-typedef union malloctest_tag
+typedef struct malloctest_tag
 {
 	// actual pointer to start of block in memory
 	addr blockAddress;
@@ -36,7 +36,7 @@ typedef union malloctest_tag
 	linkedList node;
 
 	// size of this current block
-	size_t sizeOfBlock;
+	size sizeOfBlock;
 
 	// determines if this block is in use or not
 	__vcrt_bool isInuse;
@@ -200,9 +200,12 @@ void createList(linkedList *listHead)
 	listHead->next = NULL;
 }
 
-void addToList(struct linkedList* listHead, struct linkedList* prev, struct linkedList* next)
+void addToList(malloctest* new, malloctest* old, malloctest* head)
 {
-
+	head->node.previous = (linkedList*)new;
+	old->node.next = (linkedList*)new;
+	new->node.previous = (linkedList*)old;
+	new->node.next = (linkedList*)head;
 }
 
 addr mmp_pool_init(addr const block_base, size const block_base_size, size const pool_size_bytes)
@@ -212,15 +215,15 @@ addr mmp_pool_init(addr const block_base, size const block_base_size, size const
 		// create a linked list to point at the base of the block
 		// give it the total size of the given block (pool)
 		// then specify the min size (block_base_size)
-		malloctest *initPool = (void *)block_base;
+		malloctest* const initPool = (malloctest*)block_base;
 
 		// represent accurate memory in space by substracting all data the structure keeps up
 		initPool->sizeOfBlock = pool_size_bytes - sizeof(malloctest);
 		initPool->isInuse = 0;
-
+		
 		createList(&initPool->node);
 
-		return initPool;
+		return block_base;
 	}
 	return 0;
 }
@@ -231,6 +234,20 @@ size mmp_pool_term(addr const pool)
 	if (pool)
 	{
 		// free contained memory completely
+		malloctest* headAddress = (malloctest*)pool;
+		malloctest* temp = headAddress;
+
+		do
+		{
+			malloctest* temp2 = (malloctest*)temp->node.next;
+			temp->blockAddress = NULL;
+			temp->isInuse = 0;
+			temp->node.next = NULL;
+			temp->node.previous = NULL;
+			temp->sizeOfBlock = 0;
+			
+			temp = temp2;
+		} while (temp != NULL);
 	}
 	return 0;
 }
@@ -251,7 +268,7 @@ addr mmp_block_reserve(addr const pool, size const block_size_bytes)
 		
 		listHead = temp = (malloctest*)pool;
 
-		ui32 actualSize = block_size_bytes + sizeof(malloctest);
+		size actualSize = block_size_bytes + sizeof(malloctest);
 
 		// find next opening position in pool if there is one
 		// or until a position is found
@@ -261,21 +278,34 @@ addr mmp_block_reserve(addr const pool, size const block_size_bytes)
 			{
 				if(temp->sizeOfBlock != actualSize)
 				{
-					// split up the block and create a new block
+					// create the new block that splits from older block
+					malloctest* newBlock;
+					newBlock = (malloctest*)((temp)+actualSize);
+					newBlock->sizeOfBlock = temp->sizeOfBlock - actualSize;
+					newBlock->isInuse = 0;
+
+					// assign the user block to other part of split data
+					newMalloc = temp;
+					newMalloc->sizeOfBlock = actualSize;
+					newMalloc->isInuse = 1;
+					addToList(newBlock, newMalloc, listHead);
 				}
 				else
 				{
-					// is equal, take up the whole block
+					// is equal, take up the whole block (assume the block already existed if this happens)
+					newMalloc = temp;
+						
+					temp->isInuse = 1;
 				}
 			}
 			else
 			{
 				temp = (malloctest*)temp->node.next;
 			}
-		} while (newMalloc == NULL && temp != NULL);
+		} while (newMalloc == NULL && temp != listHead);
 
 		if (newMalloc != NULL)
-			return newMalloc->blockAddress;
+			return newMalloc;
 		else
 			return 0;
 	}
@@ -288,6 +318,17 @@ size mmp_block_release(addr const block, addr const pool)
 	if (block && pool)
 	{
 		// add the freed memory back to the pool that can be used
+		malloctest* temp = (malloctest*)block;
+
+		temp->isInuse = 0;
+		temp->blockAddress = NULL;
+
+		// should deal with fragmentation here
+		// if a block is released, see if it can be added back to another block
+		// not doing that for this too much work.
+		// basic functionality is kinda there now
+
+		return temp->sizeOfBlock;
 	}
 	return 0;
 }

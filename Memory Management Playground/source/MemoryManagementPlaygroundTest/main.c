@@ -6,7 +6,7 @@ Copyright 2019-2020
 //-----------------------------------------------------------------------------
 
 #include "mmp/mmp_memory.h"
-//#include <stdio.h>
+#include <stdio.h>
 
 
 #pragma comment(lib, "MemoryManagementPlayground.lib")
@@ -59,7 +59,21 @@ int testMMP(decl_argc, decl_argv)
 
 	// as for now I have no reason to break up the chunk into multiple pools, just giving
 	// one pool all of the memory
-	addr malloc_Pool = mmp_pool_init(chunk_base, 4, count);
+	addr *malloc_Pool = mmp_pool_init(chunk_base, 4, count);
+
+	addr test = mmp_block_reserve(malloc_Pool, 4);
+
+	mmp_block_release(test, malloc_Pool);
+
+	addr test2 = mmp_block_reserve(malloc_Pool, 4);
+
+	mmp_block_release(test2, malloc_Pool);
+
+	addr test3 = mmp_block_reserve(malloc_Pool, 128);
+
+	mmp_block_release(test3, malloc_Pool);
+
+	mmp_pool_term(malloc_Pool);
 
 	// done, stack-allocated data popped
 	return 0;
