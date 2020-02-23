@@ -62,15 +62,15 @@ extern "C"
 	//	more than enough memory to hold extra objects
 	enum a3_DemoStateObjectMaxCounts
 	{
-		demoStateMaxCount_sceneObject = 8,
+		demoStateMaxCount_sceneObject = 9,
 		demoStateMaxCount_cameraObject = 1,
 		demoStateMaxCount_projector = 1,
 
 		demoStateMaxCount_timer = 1,
 		demoStateMaxCount_drawDataBuffer = 1,
 		demoStateMaxCount_vertexArray = 4,
-		demoStateMaxCount_drawable = 8,
-		demoStateMaxCount_shaderProgram = 1,
+		demoStateMaxCount_drawable = 9,
+		demoStateMaxCount_shaderProgram = 4,
 	};
 
 	// additional counters for demo modes

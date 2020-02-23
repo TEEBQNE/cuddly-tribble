@@ -179,13 +179,11 @@ extern "C"
 A3DYLIBSYMBOL a3_DemoState *a3demoCB_load(a3_DemoState *demoState, a3boolean hotbuild)
 {
 	const a3ui32 stateSize = a3demo_getPersistentStateSize();
-
-
 	
 	// do any re-allocation tasks
 	if (demoState && hotbuild)
 	{
-
+		
 	}
 
 	// do any initial allocation tasks
@@ -195,11 +193,11 @@ A3DYLIBSYMBOL a3_DemoState *a3demoCB_load(a3_DemoState *demoState, a3boolean hot
 		// good idea to set the whole block of memory to zero
 		memset(demoState, 0, stateSize);
 
-		//// set up trig table (A3DM)
-		a3trigInit(8, demoState->trigTable);
-		//
-		//// initialize state variables
-		//// e.g. timer, thread, etc.
+		// set up trig table (A3DM)
+		a3trigInit(2, demoState->trigTable);
+
+		// initialize state variables
+		// e.g. timer, thread, etc.
 		a3timerSet(demoState->renderTimer, 30.0);
 		a3timerStart(demoState->renderTimer);
 
@@ -296,6 +294,7 @@ A3DYLIBSYMBOL a3i32 a3demoCB_idle(a3_DemoState *demoState)
 			a3XboxControlUpdate(demoState->xcontrol);
 
 			// render occurred this idle: return +1
+			return 1;
 		}
 
 		// nothing happened this idle: return 0

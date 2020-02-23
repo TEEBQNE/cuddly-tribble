@@ -89,7 +89,7 @@ extern inline void a3demo_initCamera(a3_DemoCamera *camera)
 	a3real4x4SetIdentity(camera->projectionMat.m);
 	a3real4x4SetIdentity(camera->projectionMatInv.m);
 	a3real4x4SetReal4x4(camera->viewProjectionMat.m, camera->sceneObject->modelMatInv.m);
-	camera->perspective = a3false;
+	camera->perspective = a3true;
 	camera->fovy = a3real_two;
 	camera->aspect = a3real_one;
 	camera->znear = -a3real_one;
