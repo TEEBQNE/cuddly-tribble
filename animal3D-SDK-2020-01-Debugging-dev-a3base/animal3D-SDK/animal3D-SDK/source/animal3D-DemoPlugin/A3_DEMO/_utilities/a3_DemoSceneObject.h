@@ -80,7 +80,7 @@ extern "C"
 		a3vec4 color;						// RGB color with padding
 		a3real radius;						// radius (distance of effect from center)
 		a3real radiusInvSq;					// radius inverse squared (attenuation factor)
-		a3real pad[2];						// padding
+		a3real radiusInv;					// radius inverse (also used for attenuation sometimes)
 	};
 
 

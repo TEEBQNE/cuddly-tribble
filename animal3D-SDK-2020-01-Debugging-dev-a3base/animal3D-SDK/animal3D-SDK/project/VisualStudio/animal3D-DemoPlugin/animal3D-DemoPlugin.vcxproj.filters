@@ -58,6 +58,12 @@
     <Filter Include="Source Files\common\A3_DEMO\a3_DemoState">
       <UniqueIdentifier>{099be26f-4fce-44e2-ab33-a6aa6cb8589e}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Resource Files\A3_DEMO\glsl\4x\vs\shading">
+      <UniqueIdentifier>{0532bca3-6ed9-4c79-b1d3-a7409eaf0d5f}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Resource Files\A3_DEMO\glsl\4x\fs\shading">
+      <UniqueIdentifier>{ecebc447-7e41-45d8-a620-394b02913f7d}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="_src_win\main_dll.c">
@@ -129,6 +135,24 @@
     </None>
     <None Include="..\..\..\resource\glsl\4x\vs\passthru_vs4x.glsl">
       <Filter>Resource Files\A3_DEMO\glsl\4x\vs</Filter>
+    </None>
+    <None Include="..\..\..\resource\glsl\4x\vs\shading\passTexcoord_transform_vs4x.glsl">
+      <Filter>Resource Files\A3_DEMO\glsl\4x\vs\shading</Filter>
+    </None>
+    <None Include="..\..\..\resource\glsl\4x\fs\shading\drawTexture_fs4x.glsl">
+      <Filter>Resource Files\A3_DEMO\glsl\4x\fs\shading</Filter>
+    </None>
+    <None Include="..\..\..\resource\glsl\4x\fs\shading\drawPhong_multi_fs4x.glsl">
+      <Filter>Resource Files\A3_DEMO\glsl\4x\fs\shading</Filter>
+    </None>
+    <None Include="..\..\..\resource\glsl\4x\fs\shading\drawPhong_multi_nm_fs4x.glsl">
+      <Filter>Resource Files\A3_DEMO\glsl\4x\fs\shading</Filter>
+    </None>
+    <None Include="..\..\..\resource\glsl\4x\fs\shading\drawLambert_multi_fs4x.glsl">
+      <Filter>Resource Files\A3_DEMO\glsl\4x\fs\shading</Filter>
+    </None>
+    <None Include="..\..\..\resource\glsl\4x\vs\shading\passTangentBasis_transform_vs4x.glsl">
+      <Filter>Resource Files\A3_DEMO\glsl\4x\vs\shading</Filter>
     </None>
   </ItemGroup>
 </Project>

@@ -124,11 +124,24 @@ void a3demo_render_main_controls(const a3_DemoState *demoState,
 	// display mode info
 	const a3byte *modeText = "Hello animal3D!";
 	const a3byte *subModeText[demoStateMaxSubModes] = {
-		"Scene",
+		"Solid color",
+		"Shading modes",
 	};
 	const a3byte *outputText[demoStateMaxSubModes][demoStateMaxOutputModes] = {
 		{
-			"Color buffer",
+			"Color buffer 0: FINAL COLOR",
+			"Depth buffer",
+		},
+		{	
+			"Color buffer 0: FINAL COLOR",
+			"Color buffer 1: attr:position/tangent(view)",
+			"Color buffer 2: attr:normal/bitangent(view)",
+			"Color buffer 3: attr:texcoord(atlas)",
+			"Color buffer 4: map:diffuse",
+			"Color buffer 5: map:specular/normal",
+			"Color buffer 6: light:diffuse",
+			"Color buffer 7: light:specular",
+			"Depth buffer",
 		},
 	};
 
@@ -260,7 +273,7 @@ void a3demo_render_main(const a3_DemoState *demoState,
 	};
 
 	// final model matrix and full matrix stack
-	a3mat4 modelViewProjectionMat = a3mat4_identity;
+	a3mat4 modelViewProjectionMat = a3mat4_identity, modelViewMat = a3mat4_identity;
 
 	// camera used for drawing
 	const a3_DemoCamera *camera = demoState->camera + demoState->activeCamera;
@@ -278,6 +291,41 @@ void a3demo_render_main(const a3_DemoState *demoState,
 		demoState->draw_teapot,
 	};
 
+	// temp program pointers
+	const a3_DemoStateShaderProgram* program[] = {
+		demoState->prog_drawTexture,
+		demoState->prog_drawTexture,
+		demoState->prog_drawLambert_multi,
+		demoState->prog_drawPhong_multi,
+		demoState->prog_drawPhong_multi_nm,
+	};
+
+	// temp texture pointers
+	const a3_Texture *texture_dm[] = {
+		demoState->tex_checker,
+		demoState->tex_earth_dm,
+		demoState->tex_earth_dm,
+		demoState->tex_earth_dm,
+		demoState->tex_earth_dm,
+	};
+	const a3_Texture *texture_sm[] = {
+		0,
+		0,
+		0,
+		demoState->tex_earth_sm,
+		demoState->tex_earth_sm,
+	};
+	const a3_Texture* texture_nm[] = {
+		0,
+		0,
+		0,
+		0,
+		demoState->tex_earth_nm,
+	};
+
+	// framebuffer
+	const a3_Framebuffer *readFBO, *writeFBO;
+
 
 	//-------------------------------------------------------------------------
 	// 1) SCENE PASS: render scene with desired shader
@@ -287,52 +335,10 @@ void a3demo_render_main(const a3_DemoState *demoState,
 	//		- render shapes using appropriate shaders
 	//		- capture color and depth
 
-	// target back buffer
-	a3framebufferDeactivateSetViewport(a3fbo_depth24, -demoState->frameBorder, -demoState->frameBorder, demoState->frameWidth, demoState->frameHeight);
-
-	// skybox or regular clear
-	glDisable(GL_BLEND);
-	if (demoState->displaySkybox)
-	{
-		// draw solid color box, inverted
-		currentDrawable = demoState->draw_skybox;
-		currentSceneObject = demoState->skyboxObject;
-
-		currentDemoProgram = demoState->prog_drawColorUnif;
-		a3shaderProgramActivate(currentDemoProgram->program);
-		a3real4x4Product(modelViewProjectionMat.m, camera->viewProjectionMat.m, currentSceneObject->modelMat.m);
-		a3shaderUniformSendFloatMat(a3unif_mat4, 0, currentDemoProgram->uMVP, 1, modelViewProjectionMat.mm);
-		a3shaderUniformSendFloat(a3unif_vec4, currentDemoProgram->uColor, 1, skyblue);
-
-		// change depth mode to 'always' to ensure box gets drawn and resets depth
-		// draw inverted box
-		glDepthFunc(GL_ALWAYS);
-		glCullFace(GL_FRONT);
-		a3vertexDrawableActivateAndRender(currentDrawable);
-		glCullFace(GL_BACK);
-		glDepthFunc(GL_LEQUAL);
-	}
-	else
-	{
-		// clearing is expensive!
-		// only call clear if skybox is not used; 
-		//	skybox will draw over everything otherwise
-		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-	}
-
-
-	// draw grid aligned to world
-	if (demoState->displayGrid)
-	{
-		currentDemoProgram = demoState->prog_drawColorUnif;
-		a3shaderProgramActivate(currentDemoProgram->program);
-		currentDrawable = demoState->draw_grid;
-		modelViewProjectionMat = camera->viewProjectionMat;
-		a3real4x4ConcatL(modelViewProjectionMat.m, demoState->gridTransform.m);
-		a3shaderUniformSendFloatMat(a3unif_mat4, 0, currentDemoProgram->uMVP, 1, modelViewProjectionMat.mm);
-		a3shaderUniformSendFloat(a3unif_vec4, currentDemoProgram->uColor, 1, demoState->gridColor.v);
-		a3vertexDrawableActivateAndRender(currentDrawable);
-	}
+	// activate framebuffer
+	writeFBO = demoState->fbo_scene;
+	a3framebufferActivate(writeFBO);
+	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
 
 	// support multiple geometry passes
@@ -343,18 +349,6 @@ void a3demo_render_main(const a3_DemoState *demoState,
 		{
 			// forward pass
 		case 0: {
-			// select program based on settings
-			currentDemoProgram = demoState->prog_drawColorUnif;
-			a3shaderProgramActivate(currentDemoProgram->program);
-
-			// send shared data: 
-			//	- projection matrix
-			//	- light data
-			//	- activate shared textures including atlases if using
-			//	- shared animation data
-			a3shaderUniformSendFloat(a3unif_vec4, currentDemoProgram->uColor, 1, skyblue);
-			a3shaderUniformSendDouble(a3unif_single, currentDemoProgram->uTime, 1, &demoState->renderTimer->totalTime);
-
 			// individual object requirements: 
 			//	- modelviewprojection
 			//	- modelview
@@ -365,10 +359,35 @@ void a3demo_render_main(const a3_DemoState *demoState,
 				currentSceneObject <= endSceneObject;
 				++k, ++currentSceneObject)
 			{
+				// select program based on settings
+				currentDemoProgram = demoSubMode > 0 ? program[k] : demoState->prog_drawColorUnif;
+				a3shaderProgramActivate(currentDemoProgram->program);
+
+				// send shared data: 
+				//	- projection matrix
+				//	- light data
+				//	- activate shared textures including atlases if using
+				//	- shared animation data
+				a3shaderUniformBufferActivate(demoState->ubo_transform, 0);
+				a3shaderUniformBufferActivate(demoState->ubo_pointlight, 4);
+				a3shaderUniformSendInt(a3unif_single, currentDemoProgram->uCount, 1, &demoState->forwardLightCount);
+
+				// bind textures
+				a3textureActivate(texture_dm[k], a3tex_unit00);
+				a3textureActivate(texture_sm[k], a3tex_unit01);
+				a3textureActivate(texture_nm[k], a3tex_unit00);
+
 				// send data
+				a3shaderUniformSendDouble(a3unif_single, currentDemoProgram->uTime, 1, &demoState->renderTimer->totalTime);
+				a3shaderUniformSendFloatMat(a3unif_mat4, 0, currentDemoProgram->uP, 1, camera->projectionMat.mm);
 				a3real4x4Product(modelViewProjectionMat.m, camera->viewProjectionMat.m, currentSceneObject->modelMat.m);
 				a3shaderUniformSendFloatMat(a3unif_mat4, 0, currentDemoProgram->uMVP, 1, modelViewProjectionMat.mm);
-				a3shaderUniformSendFloat(a3unif_vec4, currentDemoProgram->uColor, 1, rgba4[k].v);
+				a3real4x4Product(modelViewMat.m, cameraObject->modelMatInv.m, currentSceneObject->modelMat.m);
+				a3shaderUniformSendFloatMat(a3unif_mat4, 0, currentDemoProgram->uMV, 1, modelViewMat.mm);
+				a3demo_quickInvertTranspose_internal(modelViewMat.m);
+				modelViewMat.v3 = a3vec4_zero;
+				a3shaderUniformSendFloatMat(a3unif_mat4, 0, currentDemoProgram->uMV_nrm, 1, modelViewMat.mm);
+				a3shaderUniformSendFloat(a3unif_vec4, currentDemoProgram->uColor, 1, rgba4[k + 3].v);
 
 				// draw
 				currentDrawable = drawable[k];
@@ -387,6 +406,80 @@ void a3demo_render_main(const a3_DemoState *demoState,
 
 	// revert to back buffer and disable depth testing
 	a3framebufferDeactivateSetViewport(a3fbo_depthDisable, -demoState->frameBorder, -demoState->frameBorder, demoState->frameWidth, demoState->frameHeight);
+
+	// skybox or regular clear
+	glDisable(GL_BLEND);
+	if (demoState->displaySkybox)
+	{
+		// draw solid color box, inverted
+		currentDrawable = demoState->draw_skybox;
+		currentSceneObject = demoState->skyboxObject;
+
+		currentDemoProgram = demoState->prog_drawColorUnif;
+		a3shaderProgramActivate(currentDemoProgram->program);
+		a3real4x4Product(modelViewProjectionMat.m, camera->viewProjectionMat.m, currentSceneObject->modelMat.m);
+		a3shaderUniformSendFloatMat(a3unif_mat4, 0, currentDemoProgram->uMVP, 1, modelViewProjectionMat.mm);
+		a3shaderUniformSendFloat(a3unif_vec4, currentDemoProgram->uColor, 1, grey);
+
+		// change depth mode to 'always' to ensure box gets drawn and resets depth
+		// draw inverted box
+		glCullFace(GL_FRONT);
+		a3vertexDrawableActivateAndRender(currentDrawable);
+		glCullFace(GL_BACK);
+	}
+	else
+	{
+		// clearing is expensive!
+		// only call clear if skybox is not used; 
+		//	skybox will draw over everything otherwise
+		glClear(GL_COLOR_BUFFER_BIT);
+	}
+	a3demo_enableCompositeBlending();
+
+	// present framebuffer contents
+	readFBO = demoState->fbo_scene;
+	if (readFBO->color && (!readFBO->depthStencil || demoOutput < demoOutputCount- 1))
+		a3framebufferBindColorTexture(readFBO, a3tex_unit00, demoOutput);
+	else
+		a3framebufferBindDepthTexture(readFBO, a3tex_unit00);
+
+	// draw FSQ
+	currentDemoProgram = demoState->prog_drawTexture;
+	a3shaderProgramActivate(currentDemoProgram->program);
+	a3shaderUniformSendFloatMat(a3unif_mat4, 0, currentDemoProgram->uMVP, 1, a3mat4_identity.mm);
+	a3shaderUniformSendFloatMat(a3unif_mat4, 0, currentDemoProgram->uAtlas, 1, a3mat4_identity.mm);
+	a3shaderUniformSendFloat(a3unif_vec4, currentDemoProgram->uColor, 1, a3vec4_one.v);
+	currentDrawable = demoState->draw_unitquad;
+	a3vertexDrawableActivateAndRender(currentDrawable);
+
+
+	// draw grid aligned to world
+	if (demoState->displayGrid)
+	{
+		writeFBO = demoState->fbo_scene;
+		a3framebufferActivate(writeFBO);
+		glClear(GL_COLOR_BUFFER_BIT);
+
+		currentDemoProgram = demoState->prog_drawColorUnif;
+		a3shaderProgramActivate(currentDemoProgram->program);
+		currentDrawable = demoState->draw_grid;
+		modelViewProjectionMat = camera->viewProjectionMat;
+		a3real4x4ConcatL(modelViewProjectionMat.m, demoState->gridTransform.m);
+		a3shaderUniformSendFloatMat(a3unif_mat4, 0, currentDemoProgram->uMVP, 1, modelViewProjectionMat.mm);
+		a3shaderUniformSendFloat(a3unif_vec4, currentDemoProgram->uColor, 1, demoState->gridColor.v);
+		a3vertexDrawableActivateAndRender(currentDrawable);
+	
+		a3framebufferDeactivateSetViewport(a3fbo_depthDisable, -demoState->frameBorder, -demoState->frameBorder, demoState->frameWidth, demoState->frameHeight);
+		readFBO = demoState->fbo_scene;
+		a3framebufferBindColorTexture(readFBO, a3tex_unit00, 0);
+		currentDemoProgram = demoState->prog_drawTexture;
+		a3shaderProgramActivate(currentDemoProgram->program);
+		a3shaderUniformSendFloatMat(a3unif_mat4, 0, currentDemoProgram->uMVP, 1, a3mat4_identity.mm);
+		a3shaderUniformSendFloatMat(a3unif_mat4, 0, currentDemoProgram->uAtlas, 1, a3mat4_identity.mm);
+		a3shaderUniformSendFloat(a3unif_vec4, currentDemoProgram->uColor, 1, a3vec4_one.v);
+		currentDrawable = demoState->draw_unitquad;
+		a3vertexDrawableActivateAndRender(currentDrawable);
+	}
 
 
 	// hidden volumes

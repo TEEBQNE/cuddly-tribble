@@ -54,22 +54,22 @@ A3_INLINE a3f32 a3sqrtf0xInverse(const a3f32 x);
 // A3: Fast and precise square root for floats.
 //	param x: number to square root
 //	return: square root of x
-extern a3f32 a3sqrtf(const a3f32 x);
+extern a3f32 __fastcall a3sqrtf(const a3f32 x);
 
 // A3: Fast and precise square root for doubles.
 //	param x: number to square root
 //	return: square root of x
-extern a3f64 a3sqrtd(const a3f64 x);
+extern a3f64 __fastcall a3sqrtd(const a3f64 x);
 
 // A3: Fast and precise inverse square root for floats.
 //	param x: number to square root
 //	return: square root of x
-extern a3f32 a3sqrtfInverse(const a3f32 x);
+extern a3f32 __fastcall a3sqrtfInverse(const a3f32 x);
 
 // A3: Fast and precise inverse square root for doubles.
 //	param x: number to square root
 //	return: square root of x
-extern a3f64 a3sqrtdInverse(const a3f64 x);
+extern a3f64 __fastcall a3sqrtdInverse(const a3f64 x);
 
 
 // A3: Macros for generalizing square root based on active real type.

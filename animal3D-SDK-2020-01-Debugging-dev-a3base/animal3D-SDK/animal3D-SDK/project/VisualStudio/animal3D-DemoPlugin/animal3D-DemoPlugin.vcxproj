@@ -211,11 +211,17 @@
   <ItemGroup>
     <None Include="..\..\..\resource\glsl\4x\fs\drawColorAttrib_fs4x.glsl" />
     <None Include="..\..\..\resource\glsl\4x\fs\drawColorUnif_fs4x.glsl" />
+    <None Include="..\..\..\resource\glsl\4x\fs\shading\drawLambert_multi_fs4x.glsl" />
+    <None Include="..\..\..\resource\glsl\4x\fs\shading\drawPhong_multi_fs4x.glsl" />
+    <None Include="..\..\..\resource\glsl\4x\fs\shading\drawPhong_multi_nm_fs4x.glsl" />
+    <None Include="..\..\..\resource\glsl\4x\fs\shading\drawTexture_fs4x.glsl" />
     <None Include="..\..\..\resource\glsl\4x\vs\passColor_transform_instanced_vs4x.glsl" />
     <None Include="..\..\..\resource\glsl\4x\vs\passColor_transform_vs4x.glsl" />
     <None Include="..\..\..\resource\glsl\4x\vs\passthru_transform_instanced_vs4x.glsl" />
     <None Include="..\..\..\resource\glsl\4x\vs\passthru_transform_vs4x.glsl" />
     <None Include="..\..\..\resource\glsl\4x\vs\passthru_vs4x.glsl" />
+    <None Include="..\..\..\resource\glsl\4x\vs\shading\passTangentBasis_transform_vs4x.glsl" />
+    <None Include="..\..\..\resource\glsl\4x\vs\shading\passTexcoord_transform_vs4x.glsl" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

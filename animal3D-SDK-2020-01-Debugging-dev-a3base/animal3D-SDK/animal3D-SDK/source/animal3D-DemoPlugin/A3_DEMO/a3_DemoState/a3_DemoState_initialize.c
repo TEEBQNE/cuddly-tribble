@@ -39,8 +39,9 @@
 // initialize non-asset objects
 void a3demo_initScene(a3_DemoState *demoState)
 {
-	a3ui32 i;
+	a3ui32 i, j;
 	a3_DemoCamera *camera;
+	a3_DemoPointLight *pointLight;
 
 	// camera's starting orientation depends on "vertical" axis
 	// we want the exact same view in either case
@@ -101,13 +102,21 @@ void a3demo_initScene(a3_DemoState *demoState)
 	demoState->demoModeCount = 1;
 	demoState->demoMode = 0;
 
-	// demo mode A: deferred + bloom
-	//	 1) scene
+	// A: test scene
+	//	1) solid color
 	//		a) color buffer
-	for (i = 0; i < demoStateMaxSubModes; ++i)
-		demoState->demoOutputCount[0][i] = 1;
-	demoState->demoSubModeCount[0] = demoStateMaxSubModes;
-	demoState->demoOutputCount[0][0] = demoStateMaxOutputModes;
+	//		b) depth buffer
+	//	2) shading models
+	//		a) color buffers x8
+	//		b) depth buffer
+	for (i = 0; i < demoStateMaxModes; ++i)
+	{
+		demoState->demoSubModeCount[i] = demoStateMaxSubModes;
+		for (j = 0; j < demoStateMaxSubModes; ++j)
+			demoState->demoOutputCount[i][j] = demoStateMaxOutputModes;
+	}
+	// fix value for first mode
+	demoState->demoOutputCount[0][0] = 2;
 
 
 	// initialize other objects and settings
@@ -119,6 +128,55 @@ void a3demo_initScene(a3_DemoState *demoState)
 	demoState->displayPipeline = 0;
 	demoState->updateAnimation = 1;
 	demoState->displayTangentBases = 0;
+
+
+	// lights
+	demoState->forwardLightCount = demoStateMaxCount_lightObject;
+
+	// first light position is hard-coded (starts at camera)
+	demoState->mainLightObject->position = demoState->mainCameraObject->position;
+	demoState->mainLightObject->euler = demoState->mainCameraObject->euler;
+	demoState->mainLightObject->scale = a3vec3_one;
+	pointLight = demoState->forwardPointLight;
+	pointLight->worldPos = a3vec4_w;
+	pointLight->worldPos.xyz = demoState->mainLightObject->position;
+	pointLight->radius = 100.0f;
+	pointLight->radiusInvSq = a3recip(pointLight->radius * pointLight->radius);
+	pointLight->color = a3vec4_one;
+
+	// all other lights are pseudo-random
+	a3randomSetSeed(2048);	// 0, 512, 2048, 8192, 65536
+	for (i = 1, pointLight = demoState->forwardPointLight + i;
+		i < demoStateMaxCount_lightObject;
+		++i, ++pointLight)
+	{
+		// set to zero vector
+		pointLight->worldPos = a3vec4_w;
+
+		// random positions
+		pointLight->worldPos.x = a3randomRange(-10.0f, +10.0f);
+		if (demoState->verticalAxis)
+		{
+			pointLight->worldPos.z = -a3randomRange(-10.0f, +10.0f);
+			pointLight->worldPos.y = -a3randomRange(-2.0f, +8.0f);
+		}
+		else
+		{
+			pointLight->worldPos.y = a3randomRange(-10.0f, +10.0f);
+			pointLight->worldPos.z = a3randomRange(-2.0f, +8.0f);
+		}
+
+		// random colors
+		pointLight->color.r = a3randomNormalized();
+		pointLight->color.g = a3randomNormalized();
+		pointLight->color.b = a3randomNormalized();
+		pointLight->color.a = a3real_one;
+
+		// random radius
+		pointLight->radius = a3randomRange(10.0f, 50.0f);
+		pointLight->radiusInvSq = a3recip(pointLight->radius * pointLight->radius);
+		pointLight->radiusInv = a3recip(pointLight->radius);
+	}
 
 
 	// position scene objects
@@ -150,6 +208,17 @@ void a3demo_initScene(a3_DemoState *demoState)
 		demoState->cylinderObject->position.y = +6.0f;
 		demoState->teapotObject->position.y = -6.0f;
 	}
+
+
+	// animation
+	demoState->segmentDuration = 4.0f;
+	demoState->segmentDurationInv = a3recip(demoState->segmentDuration);
+	demoState->segmentIndex = 0;
+	demoState->segmentCount = sizeof(demoState->waypoint) / sizeof(*demoState->waypoint);
+	demoState->waypoint[0] = demoState->sphereObject->position;
+	demoState->waypoint[1] = demoState->cylinderObject->position;
+	demoState->waypoint[2] = demoState->torusObject->position;
+	demoState->waypoint[3] = demoState->teapotObject->position;
 }
 
 

@@ -62,23 +62,28 @@ extern "C"
 	//	more than enough memory to hold extra objects
 	enum a3_DemoStateObjectMaxCounts
 	{
-		demoStateMaxCount_sceneObject = 9,
+		demoStateMaxCount_sceneObject = 8,
 		demoStateMaxCount_cameraObject = 1,
+		demoStateMaxCount_lightObject = 4,
 		demoStateMaxCount_projector = 1,
 
 		demoStateMaxCount_timer = 1,
 		demoStateMaxCount_drawDataBuffer = 1,
 		demoStateMaxCount_vertexArray = 4,
-		demoStateMaxCount_drawable = 9,
-		demoStateMaxCount_shaderProgram = 4,
+		demoStateMaxCount_drawable = 16,
+		demoStateMaxCount_shaderProgram = 8,
+		demoStateMaxCount_uniformBuffer = 2,
+
+		demoStateMaxCount_texture = 4,
+		demoStateMaxCount_framebuffer = 1,
 	};
 
 	// additional counters for demo modes
 	enum a3_DemoStateModeCounts
 	{
 		demoStateMaxModes = 1,
-		demoStateMaxSubModes = 1,
-		demoStateMaxOutputModes = 1,
+		demoStateMaxSubModes = 2,
+		demoStateMaxOutputModes = 9,
 	};
 
 	// demo mode names
@@ -126,7 +131,7 @@ extern "C"
 		a3_XboxControllerInput xcontrol[4];
 
 		// pointer to fast trig table
-		a3f32 trigTable[17283];
+		a3f32 trigTable[4096 * 4];
 
 
 		//---------------------------------------------------------------------
@@ -150,6 +155,17 @@ extern "C"
 
 		// cameras
 		a3ui32 activeCamera;
+
+		// lights
+		a3ui32 forwardLightCount;
+		a3_DemoPointLight forwardPointLight[demoStateMaxCount_lightObject];
+
+		// animation
+		a3vec3 waypoint[4];
+		a3ui32 segmentCount;
+		a3ui32 segmentIndex;
+		a3real segmentDuration, segmentDurationInv;
+		a3real segmentTime, segmentParam;
 
 
 		//---------------------------------------------------------------------
@@ -177,6 +193,13 @@ extern "C"
 			struct {
 				a3_DemoSceneObject
 					mainCameraObject[1];
+			};
+		};
+		union {
+			a3_DemoSceneObject lightObject[demoStateMaxCount_lightObject];
+			struct {
+				a3_DemoSceneObject
+					mainLightObject[1];
 			};
 		};
 
@@ -215,6 +238,7 @@ extern "C"
 			a3_VertexArrayDescriptor vertexArray[demoStateMaxCount_vertexArray];
 			struct {
 				a3_VertexArrayDescriptor
+					vao_tangents_texcoord[1],					// VAO for vertex format with tangent basis and texture coordinates
 					vao_position_texcoord[1],					// VAO for vertex format with position and texture coordinates
 					vao_position_color[1],						// VAO for vertex format with position and color
 					vao_position[1];							// VAO for vertex format with only position
@@ -246,10 +270,47 @@ extern "C"
 			a3_DemoStateShaderProgram shaderProgram[demoStateMaxCount_shaderProgram];
 			struct {
 				a3_DemoStateShaderProgram
+					prog_drawPhong_multi_nm[1],					// draw Phong shading with normal mapping
+					prog_drawPhong_multi[1],					// draw Phong shading model for multiple lights
+					prog_drawLambert_multi[1],					// draw Lambert shading model for multiple lights
+					prog_drawTexture[1],						// draw texture sample
 					prog_drawColorUnif[1],						// draw uniform color
 					prog_drawColorAttrib[1],					// draw color attribute
 					prog_drawColorUnif_instanced[1],			// draw uniform color with instancing
 					prog_drawColorAttrib_instanced[1];			// draw color attribute with instancing
+			};
+		};
+
+		// uniform buffers
+		union {
+			a3_UniformBuffer uniformBuffer[demoStateMaxCount_uniformBuffer];
+			struct {
+				a3_UniformBuffer
+					ubo_pointlight[1],
+					ubo_transform[1];
+			};
+		};
+
+
+		// textures
+		union {
+			a3_Texture texture[demoStateMaxCount_texture];
+			struct {
+				a3_Texture
+					tex_earth_dm[1],
+					tex_earth_sm[1],
+					tex_earth_nm[1],
+					tex_checker[1];
+			};
+		};
+
+
+		// framebuffers
+		union {
+			a3_Framebuffer framebuffer[demoStateMaxCount_framebuffer];
+			struct {
+				a3_Framebuffer
+					fbo_scene[1];
 			};
 		};
 
