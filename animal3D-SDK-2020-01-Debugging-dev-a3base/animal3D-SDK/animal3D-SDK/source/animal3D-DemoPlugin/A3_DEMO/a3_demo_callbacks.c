@@ -419,9 +419,9 @@ A3DYLIBSYMBOL void a3demoCB_keyCharPress(a3_DemoState *demoState, a3i32 asciiKey
 	{
 		// uncomment to make escape key kill the current demo
 		// if disabled, use 'exit demo' menu option
-//	case 27: 
-//		demoState->exitFlag = 1;
-//		break;
+	case 27: 
+		demoState->exitFlag = 1;
+		break;
 
 		// reload (T) or toggle (t) text
 	case 'T':

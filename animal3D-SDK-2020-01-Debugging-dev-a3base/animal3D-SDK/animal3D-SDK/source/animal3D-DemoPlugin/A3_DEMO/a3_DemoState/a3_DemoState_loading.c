@@ -202,8 +202,8 @@ void a3demo_loadGeometry(a3_DemoState *demoState)
 		//	(axes, grid, skybox, unit quad)
 		a3proceduralCreateDescriptorAxes(displayShapes + 0, a3geomFlag_wireframe, 0.0f, 1);
 		a3proceduralCreateDescriptorPlane(displayShapes + 1, a3geomFlag_wireframe, a3geomAxis_default, 20.0f, 20.0f, 20, 20);
-		a3proceduralCreateDescriptorBox(displayShapes + 2, a3geomFlag_texcoords, 100.0f, 100.0f, 100.0f, 1, 1, 1);
-		a3proceduralCreateDescriptorPlane(displayShapes + 3, a3geomFlag_texcoords, a3geomAxis_default, 2.0f, 2.0f, 1, 1);
+		a3proceduralCreateDescriptorBox(displayShapes + 2, a3geomFlag_tangents, 100.0f, 100.0f, 100.0f, 1, 1, 1);
+		a3proceduralCreateDescriptorPlane(displayShapes + 3, a3geomFlag_tangents, a3geomAxis_default, 2.0f, 2.0f, 1, 1);
 		for (i = 0; i < displayShapesCount; ++i)
 		{
 			a3proceduralGenerateGeometryData(displayShapesData + i, displayShapes + i, 0);
