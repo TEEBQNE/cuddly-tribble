@@ -340,6 +340,66 @@ void a3demo_render_main(const a3_DemoState *demoState,
 	a3framebufferActivate(writeFBO);
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
+	// revert to back buffer and disable depth testing
+	a3framebufferDeactivateSetViewport(a3fbo_depthDisable, -demoState->frameBorder, -demoState->frameBorder, demoState->frameWidth, demoState->frameHeight);
+
+	// skybox or regular clear
+	glDisable(GL_BLEND);
+	if (demoState->displaySkybox)
+	{
+		// draw solid color box, inverted
+		currentDrawable = demoState->draw_skybox;
+		currentSceneObject = demoState->skyboxObject;
+
+		currentDemoProgram = demoState->prog_drawColorUnif;
+		a3shaderProgramActivate(currentDemoProgram->program);
+		a3real4x4Product(modelViewProjectionMat.m, camera->viewProjectionMat.m, currentSceneObject->modelMat.m);
+		a3shaderUniformSendFloatMat(a3unif_mat4, 0, currentDemoProgram->uMVP, 1, modelViewProjectionMat.mm);
+		a3shaderUniformSendFloat(a3unif_vec4, currentDemoProgram->uColor, 1, grey);
+
+		// change depth mode to 'always' to ensure box gets drawn and resets depth
+		// draw inverted box
+		glCullFace(GL_FRONT);
+		a3vertexDrawableActivateAndRender(currentDrawable);
+		glCullFace(GL_BACK);
+	}
+	else
+	{
+		// clearing is expensive!
+		// only call clear if skybox is not used; 
+		//	skybox will draw over everything otherwise
+		glClear(GL_COLOR_BUFFER_BIT);
+	}
+	a3demo_enableCompositeBlending();
+
+	// draw grid aligned to world
+	if (demoState->displayGrid)
+	{
+		writeFBO = demoState->fbo_scene;
+		a3framebufferActivate(writeFBO);
+		glClear(GL_COLOR_BUFFER_BIT);
+
+		currentDemoProgram = demoState->prog_drawColorUnif;
+		a3shaderProgramActivate(currentDemoProgram->program);
+		currentDrawable = demoState->draw_grid;
+		modelViewProjectionMat = camera->viewProjectionMat;
+		a3real4x4ConcatL(modelViewProjectionMat.m, demoState->gridTransform.m);
+		a3shaderUniformSendFloatMat(a3unif_mat4, 0, currentDemoProgram->uMVP, 1, modelViewProjectionMat.mm);
+		a3shaderUniformSendFloat(a3unif_vec4, currentDemoProgram->uColor, 1, demoState->gridColor.v);
+		a3vertexDrawableActivateAndRender(currentDrawable);
+	
+		a3framebufferDeactivateSetViewport(a3fbo_depthDisable, -demoState->frameBorder, -demoState->frameBorder, demoState->frameWidth, demoState->frameHeight);
+		readFBO = demoState->fbo_scene;
+		a3framebufferBindColorTexture(readFBO, a3tex_unit00, 0);
+		currentDemoProgram = demoState->prog_drawTexture;
+		a3shaderProgramActivate(currentDemoProgram->program);
+		a3shaderUniformSendFloatMat(a3unif_mat4, 0, currentDemoProgram->uMVP, 1, a3mat4_identity.mm);
+		a3shaderUniformSendFloatMat(a3unif_mat4, 0, currentDemoProgram->uAtlas, 1, a3mat4_identity.mm);
+		a3shaderUniformSendFloat(a3unif_vec4, currentDemoProgram->uColor, 1, a3vec4_one.v);
+		currentDrawable = demoState->draw_unitquad;
+		a3vertexDrawableActivateAndRender(currentDrawable);
+	}
+
 
 	// support multiple geometry passes
 	for (i = 0, j = 1; i < j; ++i)
@@ -398,44 +458,6 @@ void a3demo_render_main(const a3_DemoState *demoState,
 		}
 	}
 
-
-	//-------------------------------------------------------------------------
-	// OVERLAYS: done after FSQ so they appear over everything else
-	//	- disable depth testing
-	//	- draw overlays appropriately
-
-	// revert to back buffer and disable depth testing
-	a3framebufferDeactivateSetViewport(a3fbo_depthDisable, -demoState->frameBorder, -demoState->frameBorder, demoState->frameWidth, demoState->frameHeight);
-
-	// skybox or regular clear
-	glDisable(GL_BLEND);
-	if (demoState->displaySkybox)
-	{
-		// draw solid color box, inverted
-		currentDrawable = demoState->draw_skybox;
-		currentSceneObject = demoState->skyboxObject;
-
-		currentDemoProgram = demoState->prog_drawColorUnif;
-		a3shaderProgramActivate(currentDemoProgram->program);
-		a3real4x4Product(modelViewProjectionMat.m, camera->viewProjectionMat.m, currentSceneObject->modelMat.m);
-		a3shaderUniformSendFloatMat(a3unif_mat4, 0, currentDemoProgram->uMVP, 1, modelViewProjectionMat.mm);
-		a3shaderUniformSendFloat(a3unif_vec4, currentDemoProgram->uColor, 1, grey);
-
-		// change depth mode to 'always' to ensure box gets drawn and resets depth
-		// draw inverted box
-		glCullFace(GL_FRONT);
-		a3vertexDrawableActivateAndRender(currentDrawable);
-		glCullFace(GL_BACK);
-	}
-	else
-	{
-		// clearing is expensive!
-		// only call clear if skybox is not used; 
-		//	skybox will draw over everything otherwise
-		glClear(GL_COLOR_BUFFER_BIT);
-	}
-	a3demo_enableCompositeBlending();
-
 	// present framebuffer contents
 	readFBO = demoState->fbo_scene;
 	if (readFBO->color && (!readFBO->depthStencil || demoOutput < demoOutputCount- 1))
@@ -452,35 +474,10 @@ void a3demo_render_main(const a3_DemoState *demoState,
 	currentDrawable = demoState->draw_unitquad;
 	a3vertexDrawableActivateAndRender(currentDrawable);
 
-
-	// draw grid aligned to world
-	if (demoState->displayGrid)
-	{
-		writeFBO = demoState->fbo_scene;
-		a3framebufferActivate(writeFBO);
-		glClear(GL_COLOR_BUFFER_BIT);
-
-		currentDemoProgram = demoState->prog_drawColorUnif;
-		a3shaderProgramActivate(currentDemoProgram->program);
-		currentDrawable = demoState->draw_grid;
-		modelViewProjectionMat = camera->viewProjectionMat;
-		a3real4x4ConcatL(modelViewProjectionMat.m, demoState->gridTransform.m);
-		a3shaderUniformSendFloatMat(a3unif_mat4, 0, currentDemoProgram->uMVP, 1, modelViewProjectionMat.mm);
-		a3shaderUniformSendFloat(a3unif_vec4, currentDemoProgram->uColor, 1, demoState->gridColor.v);
-		a3vertexDrawableActivateAndRender(currentDrawable);
-	
-		a3framebufferDeactivateSetViewport(a3fbo_depthDisable, -demoState->frameBorder, -demoState->frameBorder, demoState->frameWidth, demoState->frameHeight);
-		readFBO = demoState->fbo_scene;
-		a3framebufferBindColorTexture(readFBO, a3tex_unit00, 0);
-		currentDemoProgram = demoState->prog_drawTexture;
-		a3shaderProgramActivate(currentDemoProgram->program);
-		a3shaderUniformSendFloatMat(a3unif_mat4, 0, currentDemoProgram->uMVP, 1, a3mat4_identity.mm);
-		a3shaderUniformSendFloatMat(a3unif_mat4, 0, currentDemoProgram->uAtlas, 1, a3mat4_identity.mm);
-		a3shaderUniformSendFloat(a3unif_vec4, currentDemoProgram->uColor, 1, a3vec4_one.v);
-		currentDrawable = demoState->draw_unitquad;
-		a3vertexDrawableActivateAndRender(currentDrawable);
-	}
-
+	//-------------------------------------------------------------------------
+// OVERLAYS: done after FSQ so they appear over everything else
+//	- disable depth testing
+//	- draw overlays appropriately
 
 	// hidden volumes
 	if (demoState->displayHiddenVolumes)

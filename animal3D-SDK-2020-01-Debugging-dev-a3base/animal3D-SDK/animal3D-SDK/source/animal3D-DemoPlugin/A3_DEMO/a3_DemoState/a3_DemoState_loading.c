@@ -600,7 +600,7 @@ void a3demo_loadShaders(a3_DemoState *demoState)
 
 	// set up buffers
 	a3bufferCreate(demoState->ubo_transform, "ubo:transform", a3buffer_uniform, a3index_countMaxShort, 0);
-	a3bufferCreate(demoState->ubo_transform, "ubo:pointlight", a3buffer_uniform, a3index_countMaxShort, 0);
+	a3bufferCreate(demoState->ubo_pointlight, "ubo:pointlight", a3buffer_uniform, a3index_countMaxShort, 0);
 
 
 	printf("\n\n---------------- LOAD SHADERS FINISHED ---------------- \n");
