@@ -57,7 +57,8 @@ public int TestInt
         // set the variable like normal
         testInt = value;
     }
-}```
+}
+```
     
 If you follow this template and attach it to every variable, making sure that the attribute and property is set up correctly, the program will find it on startup. If you have trouble setting anything up, don't hestitate to drop a comment or contact me directly!
 
