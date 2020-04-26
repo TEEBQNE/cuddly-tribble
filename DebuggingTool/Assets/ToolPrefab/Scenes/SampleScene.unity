@@ -516,6 +516,46 @@ PrefabInstance:
       propertyPath: m_Name
       value: Managers
       objectReference: {fileID: 0}
+    - target: {fileID: 6157156924738328640, guid: 6830773d84c314199963291675db1b0b,
+        type: 3}
+      propertyPath: variableButtonScrollHolder
+      value: 
+      objectReference: {fileID: 28663493}
+    - target: {fileID: 6157156924738328640, guid: 6830773d84c314199963291675db1b0b,
+        type: 3}
+      propertyPath: currentVarText
+      value: 
+      objectReference: {fileID: 1345426585}
+    - target: {fileID: 6157156924738328640, guid: 6830773d84c314199963291675db1b0b,
+        type: 3}
+      propertyPath: currentstackIndexText
+      value: 
+      objectReference: {fileID: 350629579}
+    - target: {fileID: 6157156924738328640, guid: 6830773d84c314199963291675db1b0b,
+        type: 3}
+      propertyPath: currentValue
+      value: 
+      objectReference: {fileID: 544154610}
+    - target: {fileID: 6157156924738328640, guid: 6830773d84c314199963291675db1b0b,
+        type: 3}
+      propertyPath: stackHolder
+      value: 
+      objectReference: {fileID: 797018580}
+    - target: {fileID: 6157156924738328640, guid: 6830773d84c314199963291675db1b0b,
+        type: 3}
+      propertyPath: canvasReferences
+      value: 
+      objectReference: {fileID: 733361781}
+    - target: {fileID: 6157156924738328640, guid: 6830773d84c314199963291675db1b0b,
+        type: 3}
+      propertyPath: graphWindowRef
+      value: 
+      objectReference: {fileID: 473815941}
+    - target: {fileID: 6157156924738328640, guid: 6830773d84c314199963291675db1b0b,
+        type: 3}
+      propertyPath: graphFailText
+      value: 
+      objectReference: {fileID: 3683537}
     - target: {fileID: 6157156924711291387, guid: 6830773d84c314199963291675db1b0b,
         type: 3}
       propertyPath: m_LocalPosition.x
@@ -571,46 +611,6 @@ PrefabInstance:
       propertyPath: m_LocalEulerAnglesHint.z
       value: 0
       objectReference: {fileID: 0}
-    - target: {fileID: 6157156924738328640, guid: 6830773d84c314199963291675db1b0b,
-        type: 3}
-      propertyPath: variableButtonScrollHolder
-      value: 
-      objectReference: {fileID: 28663493}
-    - target: {fileID: 6157156924738328640, guid: 6830773d84c314199963291675db1b0b,
-        type: 3}
-      propertyPath: currentVarText
-      value: 
-      objectReference: {fileID: 1345426585}
-    - target: {fileID: 6157156924738328640, guid: 6830773d84c314199963291675db1b0b,
-        type: 3}
-      propertyPath: currentstackIndexText
-      value: 
-      objectReference: {fileID: 350629579}
-    - target: {fileID: 6157156924738328640, guid: 6830773d84c314199963291675db1b0b,
-        type: 3}
-      propertyPath: currentValue
-      value: 
-      objectReference: {fileID: 544154610}
-    - target: {fileID: 6157156924738328640, guid: 6830773d84c314199963291675db1b0b,
-        type: 3}
-      propertyPath: stackHolder
-      value: 
-      objectReference: {fileID: 797018580}
-    - target: {fileID: 6157156924738328640, guid: 6830773d84c314199963291675db1b0b,
-        type: 3}
-      propertyPath: canvasReferences
-      value: 
-      objectReference: {fileID: 733361781}
-    - target: {fileID: 6157156924738328640, guid: 6830773d84c314199963291675db1b0b,
-        type: 3}
-      propertyPath: graphWindowRef
-      value: 
-      objectReference: {fileID: 473815941}
-    - target: {fileID: 6157156924738328640, guid: 6830773d84c314199963291675db1b0b,
-        type: 3}
-      propertyPath: graphFailText
-      value: 
-      objectReference: {fileID: 3683537}
     m_RemovedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: 6830773d84c314199963291675db1b0b, type: 3}
 --- !u!1001 &6396980873455259054
@@ -624,6 +624,11 @@ PrefabInstance:
         type: 3}
       propertyPath: m_Name
       value: Canvases
+      objectReference: {fileID: 0}
+    - target: {fileID: 6396980873449804651, guid: bacd033853235454fb8e84a1337cd5ca,
+        type: 3}
+      propertyPath: m_SizeDelta.y
+      value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 6396980873080798170, guid: bacd033853235454fb8e84a1337cd5ca,
         type: 3}
@@ -715,9 +720,19 @@ PrefabInstance:
       propertyPath: m_OnClick.m_PersistentCalls.m_Calls.Array.data[0].m_Target
       value: 
       objectReference: {fileID: 1868658894}
-    - target: {fileID: 6396980873449804651, guid: bacd033853235454fb8e84a1337cd5ca,
+    - target: {fileID: 6396980874335972310, guid: bacd033853235454fb8e84a1337cd5ca,
         type: 3}
-      propertyPath: m_SizeDelta.y
+      propertyPath: m_RaycastTarget
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 6396980873093473934, guid: bacd033853235454fb8e84a1337cd5ca,
+        type: 3}
+      propertyPath: m_RaycastTarget
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 6396980872735414108, guid: bacd033853235454fb8e84a1337cd5ca,
+        type: 3}
+      propertyPath: m_RaycastTarget
       value: 0
       objectReference: {fileID: 0}
     m_RemovedComponents: []
