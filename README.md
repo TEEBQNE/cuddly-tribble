@@ -39,25 +39,25 @@ If you would like to add the tool to track your own variable, I would recommend 
 private int testInt;
 
 // accessor variable to get setter/getter methods
-    [DebugVariable]
-    public int TestInt
+[DebugVariable]
+public int TestInt
+{
+    get => testInt;
+    set
     {
-        get => testInt;
-        set
-        {
-            // store all data that was created here
-            DebuggingManager.Instance.RecieveDebuggingData
-            (
-                gameObject.name + this.GetType().Name + nameof(TestInt),                    // unique ID of this variable/script/gameobject
-                testInt.ToString(),                                                         // old value of variable
-                value.ToString(),                                                           // new value of variable
-                Time.timeSinceLevelLoad.ToString("0.0")                                    // current time that this was set for graph
-            );
+        // store all data that was created here
+        DebuggingManager.Instance.RecieveDebuggingData
+        (
+            gameObject.name + this.GetType().Name + nameof(TestInt),                    // unique ID of this variable/script/gameobject
+            testInt.ToString(),                                                         // old value of variable
+            value.ToString(),                                                           // new value of variable
+            Time.timeSinceLevelLoad.ToString("0.0")                                     // current time that this was set for graph
+        );
 
-            // set the variable like normal
-            testInt = value;
-        }
-    }`
+        // set the variable like normal
+        testInt = value;
+    }
+}```
     
 If you follow this template and attach it to every variable, making sure that the attribute and property is set up correctly, the program will find it on startup. If you have trouble setting anything up, don't hestitate to drop a comment or contact me directly!
 
