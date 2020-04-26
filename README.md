@@ -32,29 +32,29 @@ Running the program is rather simple. I have set everything up with a test game 
 
 If you would like to add the tool to track your own variable, I would recommend tracking only primitive data types as tracking other types can be a bit involved. The example project currently tracks ints, floats, strings and vec3s to show how to set everything up. When you have a variable you would like to track, make a public property for it, giving it the setter/getter methods. 
 
-`
-/// test variable for the tool
+```csharp
+// test variable for the tool
 [SerializeField]
 [DisplayWithoutEdit]
 private int testInt;
 
-/// accessor variable to get setter/getter methods
+// accessor variable to get setter/getter methods
     [DebugVariable]
     public int TestInt
     {
         get => testInt;
         set
         {
-            /// store all data that was created here
+            // store all data that was created here
             DebuggingManager.Instance.RecieveDebuggingData
             (
-                gameObject.name + this.GetType().Name + nameof(TestInt),                    /// unique ID of this variable/script/gameobject
-                testInt.ToString(),                                                         /// old value of variable
-                value.ToString(),                                                           /// new value of variable
-                Time.timeSinceLevelLoad.ToString("0.0")                                    /// current time that this was set for graph
+                gameObject.name + this.GetType().Name + nameof(TestInt),                    // unique ID of this variable/script/gameobject
+                testInt.ToString(),                                                         // old value of variable
+                value.ToString(),                                                           // new value of variable
+                Time.timeSinceLevelLoad.ToString("0.0")                                    // current time that this was set for graph
             );
 
-            /// set the variable like normal
+            // set the variable like normal
             testInt = value;
         }
     }`
