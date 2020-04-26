@@ -17,13 +17,17 @@ Unity 2019.1.0f2+
 Firstly, make sure you have Unity installed using Unity Hub with a version over or equal to 2019.1.0f2.
 
 ```
-To verify you have a proper version of Unity installed, go to Unity Hub, and on the bottom left hand of the UI selection tab, click on Installs. As long as you have a version that reads in 2019, the project should be fine to open in it. 
+To verify you have a proper version of Unity installed, go to Unity Hub, and on the bottom left hand of the UI selection tab,
+click on Installs. As long as you have a version that reads in 2019, the project should be fine to open in it. 
 ```
 
 Once you verify you have the proper version, add the project to your Unity Hub.
 
 ```
-Click on the top right button add, navigate to the root project folder, select it and the project should appear now. If you have the exact version of Unity I have downloaded, you can just open the project up, if not, you will need to select which version you want to open the project in. Again, I highly recommend you download the same version, or at the very least a version after the one I am using.
+Click on the top right button add, navigate to the root project folder, select it and the project should appear now. If you
+have the exact version of Unity I have downloaded, you can just open the project up, if not, you will need to select which
+version you want to open the project in. Again, I highly recommend you download the same version, or at the very least a
+version after the one I am using.
 ```
 
 ## Running the tests
